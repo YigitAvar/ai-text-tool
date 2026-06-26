@@ -1,0 +1,7 @@
+pynput
+pyperclip
+pystray
+Pillow
+plyer
+pyyaml
+httpx

@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Sanal ortam
+.venv/
+venv/
+env/
+
+# Test / kapsam
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editör / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# İşletim sistemi
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Yerel ayarlar / araç klasörleri
+.claude/
+*.local.json
+
+# Yerel / kişisel config geçersiz kılmaları
+config.local.yaml
+.env

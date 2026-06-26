@@ -1,0 +1,7 @@
+# Satır sonlarını normalize et: depoda LF, checkout'ta platforma uygun.
+* text=auto eol=lf
+
+# Python kaynakları daima LF.
+*.py text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf

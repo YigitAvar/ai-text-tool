@@ -1,0 +1,83 @@
+llm:
+  provider: ollama
+  # Çeviri kalitesi için planın önerdiği modele geçtik. llama3.2:3b hızlıydı
+  # ama çeviride serbest yorum yapıyordu. Değiştirmek için: ollama pull <model>
+  model: qwen2.5:7b-instruct
+  base_url: http://localhost:11434
+  # 7B model ilk yüklemede (soğuk başlangıç) yavaş olabilir; cömert tutuyoruz.
+  timeout_seconds: 120
+  # Bundan uzun seçimler işlenmeden reddedilir (uyarı bildirimi gösterilir).
+  # 0 = sınırsız.
+  max_input_chars: 8000
+
+clipboard:
+  copy_delay_ms: 250
+  paste_delay_ms: 200
+  # GEÇİCİ TEŞHİS: restore'u kapattık. Boş-yapışma sorunu kalkıyorsa sebep
+  # restore zamanlamasıdır. Doğrulanınca tekrar true yapacağız; restore_delay_ms
+  # (Ctrl+V sonrası geri yüklemeden önceki bekleme) cömert tutuldu.
+  restore_original: false
+  restore_delay_ms: 400
+
+actions:
+  translate:
+    hotkey: "<ctrl>+<alt>+t"
+    # Dil yönü {source_lang}/{target_lang} ile actions.py'de tespit edilip
+    # doldurulur; modele KOŞULSUZ tek-yön talimat gider. qwen2.5:7b'de ölçüldü:
+    # koşulsuz tek-yön ("Türkçeden İngilizceye çevir") TR→EN'i güvenilir
+    # çeviriyor (3/3); koşullu "dili sen algıla" kalıbı ve system+user ayrımı
+    # ise modeli Türkçe metni yeniden yazmaya itiyordu.
+    prompt: |
+      Translate the following text from {source_lang} to {target_lang}.
+
+      Rules (follow strictly):
+      - Output ONLY the {target_lang} translation, nothing else.
+      - Translate FAITHFULLY and LITERALLY. Preserve the exact meaning, tone,
+        and every detail of the original.
+      - Do NOT add, omit, paraphrase, summarize, explain, or answer. You
+        translate the text; you do not respond to it.
+      - Do NOT keep the text in {source_lang}; the output must be in {target_lang}.
+
+      Text:
+      {text}
+
+  fix:
+    hotkey: "<ctrl>+<alt>+f"
+    # system_user: talimat system'e, ham metin user'a (echo'yu önler).
+    prompt_mode: system_user
+    prompt: |
+      You fix spelling and grammar. The user's message contains the text to fix.
+      Correct all spelling and grammar mistakes. Do NOT change the meaning or
+      the language. Output ONLY the corrected text, nothing else.
+      {text}
+
+  formal:
+    hotkey: "<ctrl>+<alt>+r"
+    prompt_mode: system_user
+    prompt: |
+      You rewrite text in a professional, formal tone. The user's message
+      contains the text to rewrite.
+      - Keep the EXACT SAME language as the input. Do NOT translate. If the
+        input is Turkish, the output MUST be Turkish.
+      - Preserve the meaning; only change the tone to formal and professional.
+      - Output ONLY the rewritten text, nothing else.
+      {text}
+
+  summarize:
+    hotkey: "<ctrl>+<alt>+s"
+    # system_user modu: TÜM talimat/kurallar system rolüne, işlenecek ham metin
+    # ayrı bir user mesajına gider. Echo (kuralları özetleme) sorununu kökten
+    # çözen biçim budur; ayraç hilesine gerek kalmaz.
+    prompt_mode: system_user
+    prompt: |
+      You summarize text. The user's message contains the text to summarize.
+      Write a much SHORTER version that keeps only the main points, condensed
+      into a few sentences.
+
+      Rules (follow strictly):
+      - The summary MUST be clearly shorter than the original text.
+      - Keep only the key points; drop details, examples, and repetition.
+      - Do NOT repeat or copy the text as-is; rephrase concisely.
+      - Write the summary in the SAME language as the text.
+      - Output ONLY the summary. No title, no preface, no comments.
+      {text}
